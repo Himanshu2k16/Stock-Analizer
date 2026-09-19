@@ -31,6 +31,14 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
         </>
       }
     >
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brass/30 bg-brass-deep px-4 py-3">
+        <div>
+          <p className="label-mono">Real TradingView chart</p>
+          <p className="mt-1 text-sm text-paper-dim">Candles, drawings, indicators, zoom and saved layouts open on TradingView.</p>
+        </div>
+        <TradingViewLink symbol={quote.symbol} featured />
+      </div>
+
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div className="flex flex-wrap items-end gap-4">
           <p className="num text-4xl leading-none text-paper">

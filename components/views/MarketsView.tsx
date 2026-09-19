@@ -22,10 +22,10 @@ export function MarketsView() {
           <EmptyState>Watchlist is empty — add a symbol from the search above.</EmptyState>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[790px] border-collapse text-sm">
+            <table className="w-full min-w-[900px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-hairline text-left">
-                  {["Instrument", "LTP", "Session", "Trend 10d", "Volume", "TV", ""].map((heading) => (
+                  {["Instrument", "LTP", "Session", "Trend 10d", "Volume", "TradingView", ""].map((heading) => (
                     <th key={heading} className="label-mono pb-3 pr-4 font-medium">
                       {heading}
                     </th>
@@ -60,7 +60,7 @@ export function MarketsView() {
                       </td>
                       <td className="num py-3 pr-4 text-xs text-paper-dim">{compact(quote.volume)}</td>
                       <td className="py-3 pr-4">
-                        <TradingViewLink symbol={quote.symbol} compact />
+                        <TradingViewLink symbol={quote.symbol} />
                       </td>
                       <td className="py-3 text-right">
                         <button
