@@ -32,12 +32,15 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
       }
     >
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <p className="num text-4xl leading-none text-paper">
-          {price(quote.price, quote.currency)}
-          <span className={up ? "ml-3 text-base text-jade" : "ml-3 text-base text-coral"}>
-            {up ? "▲" : "▼"} {price(Math.abs(quote.change), quote.currency)}
-          </span>
-        </p>
+        <div className="flex flex-wrap items-end gap-4">
+          <p className="num text-4xl leading-none text-paper">
+            {price(quote.price, quote.currency)}
+            <span className={up ? "ml-3 text-base text-jade" : "ml-3 text-base text-coral"}>
+              {up ? "▲" : "▼"} {price(Math.abs(quote.change), quote.currency)}
+            </span>
+          </p>
+          <TradingViewLink symbol={quote.symbol} className="mb-1 h-9 px-4" />
+        </div>
         <div className="grid w-full max-w-md grid-cols-2 gap-x-8 gap-y-3">
           <RangeBar label="Day range" low={quote.dayLow} high={quote.dayHigh} position={dayPosition} currency={quote.currency} />
           <RangeBar label="52-week range" low={quote.fiftyTwoWeekLow} high={quote.fiftyTwoWeekHigh} position={yearPosition} currency={quote.currency} />

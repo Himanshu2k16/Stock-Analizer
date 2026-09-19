@@ -30,7 +30,7 @@ export function TradingViewLink({
         className,
       )}
     >
-      {!compact && <span>TradingView</span>}
+      {!compact && <span>Open TradingView</span>}
       <ExternalLink size={13} strokeWidth={1.8} />
     </a>
   );
