@@ -3,7 +3,6 @@
 import clsx from "clsx";
 import { X } from "lucide-react";
 import { InstrumentPanel } from "@/components/InstrumentPanel";
-import { TradingViewLink } from "@/components/TradingViewLink";
 import { Delta, EmptyState, Panel, Sparkline } from "@/components/ui";
 import { compact, displaySymbol, price } from "@/lib/logic/format";
 import { useMarket } from "@/lib/market/MarketProvider";
@@ -15,7 +14,7 @@ export function MarketsView() {
     <div className="space-y-5">
       <InstrumentPanel quote={quotes.find((quote) => quote.symbol === selectedSymbol)} />
 
-      <Panel label={`${quotes.length} instruments`} title="Watchlist board">
+      <Panel label={`${quotes.length} stocks`} title="Your watchlist">
         {quotes.length === 0 && loading ? (
           <p className="py-8 text-center text-sm text-paper-faint">Pulling the first sync from Yahoo Finance…</p>
         ) : quotes.length === 0 ? (
@@ -25,7 +24,7 @@ export function MarketsView() {
             <table className="w-full min-w-[900px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-hairline text-left">
-                  {["Instrument", "LTP", "Session", "Trend 10d", "Volume", "TradingView", ""].map((heading) => (
+                  {["Stock", "Price", "Today", "Trend", "Volume", "Chart", ""].map((heading) => (
                     <th key={heading} className="label-mono pb-3 pr-4 font-medium">
                       {heading}
                     </th>
@@ -60,7 +59,15 @@ export function MarketsView() {
                       </td>
                       <td className="num py-3 pr-4 text-xs text-paper-dim">{compact(quote.volume)}</td>
                       <td className="py-3 pr-4">
-                        <TradingViewLink symbol={quote.symbol} />
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            selectSymbol(quote.symbol);
+                          }}
+                          className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                        >
+                          View chart
+                        </button>
                       </td>
                       <td className="py-3 text-right">
                         <button

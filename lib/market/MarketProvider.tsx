@@ -64,17 +64,35 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const [selectedSymbol, setSelectedSymbol] = useState(defaultWatchlist[0]);
   const firstLoad = useRef(true);
 
-  const watchlistKey = watchlist.join(",");
+  const effectiveWatchlist = watchlist.length > 0 ? watchlist : defaultWatchlist;
+  const watchlistKey = effectiveWatchlist.join(",");
 
   const load = useCallback(async () => {
     if (firstLoad.current) setLoading(true);
     else setRefreshing(true);
     try {
-      const response = await fetch(`/api/market/quotes?symbols=${encodeURIComponent(watchlistKey)}`, { cache: "no-store" });
-      const payload = (await response.json()) as QuoteResponse;
-      setQuotes(payload.quotes.map((quote) => ({ ...quote, history: addIndicators(quote.history) })));
-      setErrors(payload.errors);
+      const fetchQuotes = async (symbols: string) => {
+        const response = await fetch(`/api/market/quotes?symbols=${encodeURIComponent(symbols)}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Quote request failed (${response.status})`);
+        return (await response.json()) as QuoteResponse;
+      };
+
+      let payload = await fetchQuotes(watchlistKey);
+      if (payload.quotes.length === 0 && watchlistKey !== defaultWatchlist.join(",")) {
+        payload = await fetchQuotes(defaultWatchlist.join(","));
+        setSelectedSymbol(defaultWatchlist[0]);
+      }
+
+      const nextQuotes = payload.quotes.map((quote) => ({ ...quote, history: addIndicators(quote.history) }));
+      setQuotes(nextQuotes);
+      setErrors(
+        nextQuotes.length === 0
+          ? [{ symbol: "Watchlist", message: "No prices came back. Try a stock suggestion like Reliance, Infosys or Tata Steel." }, ...payload.errors]
+          : payload.errors,
+      );
       setFetchedAt(payload.fetchedAt);
+    } catch (error) {
+      setErrors([{ symbol: "Market data", message: error instanceof Error ? error.message : "Could not load prices." }]);
     } finally {
       firstLoad.current = false;
       setLoading(false);
@@ -84,7 +102,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     firstLoad.current = true;
-    void load();
+    queueMicrotask(() => void load());
     const timer = setInterval(() => void load(), 60_000);
     return () => clearInterval(timer);
   }, [load]);

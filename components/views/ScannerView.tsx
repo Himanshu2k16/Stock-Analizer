@@ -3,7 +3,6 @@
 import clsx from "clsx";
 import { Bell, Download, Play } from "lucide-react";
 import { useState } from "react";
-import { TradingViewLink } from "@/components/TradingViewLink";
 import { Button, Delta, EmptyState, Panel, Pill, SkeletonGrid } from "@/components/ui";
 import { createAlert } from "@/lib/logic/alerts";
 import { getScannerTemplate, scannerTemplates } from "@/lib/logic/scanner";
@@ -57,7 +56,7 @@ export function ScannerView() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
-        <Panel label="Definition" title={active.name} className="lg:col-span-1" actions={<Pill tone="jade">OHLC truth</Pill>}>
+        <Panel label="How this filter works" title={active.name} className="lg:col-span-1" actions={<Pill tone="jade">Real price data</Pill>}>
           <div className="space-y-2.5">
             {active.filters.map((filter, index) => (
               <div key={filter} className="flex items-start gap-3 rounded-lg border border-hairline bg-ink-950/55 px-4 py-3">
@@ -83,7 +82,7 @@ export function ScannerView() {
         </Panel>
 
         <Panel
-          label="Universe screened"
+          label="Stocks checked"
           title={`${result?.matches.length ?? 0} match${result?.matches.length === 1 ? "" : "es"} of ${result?.universe ?? "…"}`}
           className="lg:col-span-2"
           actions={<Pill tone="brass">{result ? `Synced ${clockTime(result.fetchedAt)}` : loading ? "Running" : "Idle"}</Pill>}
@@ -97,7 +96,7 @@ export function ScannerView() {
               <table className="w-full min-w-[760px] border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-hairline text-left">
-                    {["Stock", "LTP", "Session", "EMA 200", "Dist", "RSI", "Score", "TV", ""].map((heading) => (
+                    {["Stock", "Price", "Today", "EMA 200", "Distance", "RSI", "Score", "Chart", ""].map((heading) => (
                       <th key={heading} className="label-mono pb-3 pr-4 font-medium">
                         {heading}
                       </th>
@@ -133,7 +132,12 @@ export function ScannerView() {
                         </div>
                       </td>
                       <td className="py-3 pr-4">
-                        <TradingViewLink symbol={match.symbol} compact />
+                        <button
+                          onClick={() => selectSymbol(match.symbol)}
+                          className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                        >
+                          View
+                        </button>
                       </td>
                       <td className="py-3 text-right">
                         <button

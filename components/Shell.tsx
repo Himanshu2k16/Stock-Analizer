@@ -4,29 +4,30 @@ import clsx from "clsx";
 import { Bell, Briefcase, LayoutDashboard, Newspaper, Plus, Radar, RefreshCw, ShieldCheck, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Dot } from "@/components/ui";
+import { stockSuggestions } from "@/lib/data/symbols";
 import { useMarketClock } from "@/lib/hooks/useMarketClock";
 import { useMarket } from "@/lib/market/MarketProvider";
 import { displaySymbol, price } from "@/lib/logic/format";
 
 const nav = [
-  { href: "/", label: "Command", icon: LayoutDashboard },
-  { href: "/markets", label: "Markets", icon: TrendingUp },
-  { href: "/scanner", label: "Scanner", icon: Radar },
-  { href: "/portfolio", label: "Portfolio", icon: Briefcase },
-  { href: "/alerts", label: "Alerts", icon: Bell },
-  { href: "/research", label: "Research", icon: Newspaper },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/markets", label: "Stocks", icon: TrendingUp },
+  { href: "/scanner", label: "Find Stocks", icon: Radar },
+  { href: "/portfolio", label: "My Portfolio", icon: Briefcase },
+  { href: "/alerts", label: "Price Alerts", icon: Bell },
+  { href: "/research", label: "News", icon: Newspaper },
 ];
 
 const pageMeta: Record<string, { eyebrow: string; title: string }> = {
-  "/": { eyebrow: "Session overview", title: "Command Deck" },
-  "/markets": { eyebrow: "Live instruments", title: "Market Board" },
-  "/scanner": { eyebrow: "Technical screens", title: "Scanner Studio" },
-  "/portfolio": { eyebrow: "Book of holdings", title: "Portfolio Desk" },
-  "/alerts": { eyebrow: "Price automation", title: "Alert Operations" },
-  "/research": { eyebrow: "Signals & headlines", title: "Research Room" },
+  "/": { eyebrow: "Overview", title: "Home" },
+  "/markets": { eyebrow: "Live prices and charts", title: "Stocks" },
+  "/scanner": { eyebrow: "Find opportunities", title: "Stock Screener" },
+  "/portfolio": { eyebrow: "Your holdings", title: "My Portfolio" },
+  "/alerts": { eyebrow: "Price reminders", title: "Price Alerts" },
+  "/research": { eyebrow: "Market updates", title: "News" },
 };
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -44,7 +45,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </span>
           <span>
             <strong className="block font-display text-base font-semibold leading-none">Meridian</strong>
-            <span className="label-mono mt-1 block">Personal market desk</span>
+            <span className="label-mono mt-1 block">Stock tracker</span>
           </span>
         </Link>
 
@@ -100,7 +101,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 className="flex h-9 items-center gap-2 rounded-md border border-hairline-strong bg-ink-850/75 px-3 font-mono text-[11px] uppercase text-paper-dim transition-colors hover:border-brass/50 hover:text-brass-bright disabled:opacity-40"
               >
                 <RefreshCw size={14} className={clsx(refreshing && "animate-spin")} />
-                {refreshing ? "Syncing" : "Refresh"}
+                {refreshing ? "Updating" : "Refresh prices"}
               </button>
             </div>
           </div>
@@ -160,10 +161,28 @@ export function Shell({ children }: { children: ReactNode }) {
 function AddSymbol() {
   const { addSymbol } = useMarket();
   const [value, setValue] = useState("");
+  const [focused, setFocused] = useState(false);
+
+  const matches = useMemo(() => {
+    const query = value.trim().toUpperCase();
+    if (query.length < 1) return [];
+    return stockSuggestions
+      .filter((item) => item.symbol.includes(query) || item.name.toUpperCase().includes(query))
+      .slice(0, 6);
+  }, [value]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (matches[0]) {
+      choose(matches[0].symbol);
+      return;
+    }
     if (addSymbol(value)) setValue("");
+  }
+
+  function choose(symbol: string) {
+    if (addSymbol(symbol)) setValue("");
+    setFocused(false);
   }
 
   return (
@@ -172,10 +191,45 @@ function AddSymbol() {
       <input
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        placeholder="Add symbol"
-        aria-label="Add symbol to watchlist"
-        className="h-9 w-40 rounded-md border border-hairline bg-ink-950/70 pl-8 pr-3 font-mono text-[11px] uppercase text-paper outline-none transition-colors placeholder:normal-case placeholder:text-paper-faint focus:w-52 focus:border-brass/70 focus:bg-ink-850"
+        onFocus={() => setFocused(true)}
+        onBlur={() => window.setTimeout(() => setFocused(false), 120)}
+        placeholder="Search stock"
+        aria-label="Search and add stock"
+        className="h-9 w-48 rounded-md border border-hairline bg-ink-950/70 pl-8 pr-3 text-sm text-paper outline-none transition-colors placeholder:normal-case placeholder:text-paper-faint focus:w-72 focus:border-brass/70 focus:bg-ink-850"
       />
+      {focused && value.trim() && (
+        <div className="absolute right-0 top-11 z-50 w-80 overflow-hidden rounded-lg border border-hairline-strong bg-ink-900 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.95)]">
+          {matches.map((item) => (
+            <button
+              type="button"
+              key={item.symbol}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                choose(item.symbol);
+              }}
+              className="flex w-full items-center justify-between gap-4 border-b border-hairline px-4 py-3 text-left last:border-0 hover:bg-ink-850"
+            >
+              <span>
+                <span className="block text-sm font-medium text-paper">{item.name}</span>
+                <span className="mt-0.5 block font-mono text-[10px] uppercase text-paper-faint">{item.exchange}</span>
+              </span>
+              <span className="font-mono text-xs text-brass-bright">{displaySymbol(item.symbol)}</span>
+            </button>
+          ))}
+          {matches.length === 0 && (
+            <button
+              type="submit"
+              className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left hover:bg-ink-850"
+            >
+              <span>
+                <span className="block text-sm font-medium text-paper">Add typed symbol</span>
+                <span className="mt-0.5 block text-xs text-paper-faint">Press Enter if you know the exact NSE symbol.</span>
+              </span>
+              <span className="font-mono text-xs text-brass-bright">{value.trim().toUpperCase()}</span>
+            </button>
+          )}
+        </div>
+      )}
     </form>
   );
 }

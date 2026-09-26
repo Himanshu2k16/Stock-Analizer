@@ -18,7 +18,7 @@ export function AlertsView() {
     <div className="grid gap-5 lg:grid-cols-3">
       <Panel
         label={`${armed} armed · ${alerts.length} total`}
-        title="Rule book"
+        title="Your alerts"
         className="lg:col-span-2 lg:order-2"
         actions={<Pill tone={armed ? "jade" : "neutral"}>{armed ? "Live" : "Silent"}</Pill>}
       >
@@ -54,7 +54,7 @@ function Composer() {
   }
 
   return (
-    <Panel label="Plain language" title="Rule maker" actions={<Sparkles size={16} className="text-brass" />}>
+    <Panel label="Type what you want" title="Create alert" actions={<Sparkles size={16} className="text-brass" />}>
       <form onSubmit={submit} className="space-y-3">
         <textarea
           value={text}
@@ -94,7 +94,7 @@ function ManualForm() {
   }
 
   return (
-    <Panel label="Exact thresholds" title="Manual rule">
+    <Panel label="Choose stock and price" title="Manual alert">
       <form onSubmit={submit} className="space-y-3">
         <SelectField value={symbol} onChange={(event) => setSymbol(event.target.value)} aria-label="Symbol">
           {quotes.map((quote) => (

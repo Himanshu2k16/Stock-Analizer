@@ -3,7 +3,6 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { TradingViewLink } from "@/components/TradingViewLink";
 import { Button, Delta, EmptyState, Panel, Stat, TextField, inputClass } from "@/components/ui";
 import { displaySymbol, money, price, signedMoney, signedPercent } from "@/lib/logic/format";
 import { useMarket } from "@/lib/market/MarketProvider";
@@ -11,7 +10,7 @@ import { useMarket } from "@/lib/market/MarketProvider";
 const palette = ["#20c7df", "#26d983", "#ff5f5f", "#f4b860", "#7c5cff", "#38bdf8", "#f472b6", "#a3e635"];
 
 export function PortfolioView() {
-  const { portfolio, quotes, holdings, addHolding, removeHolding, addSymbol } = useMarket();
+  const { portfolio, quotes, holdings, addHolding, removeHolding, addSymbol, selectSymbol } = useMarket();
   const unrealizedPercent = portfolio.totalCost ? (portfolio.unrealizedPnl / portfolio.totalCost) * 100 : 0;
   const quoted = quotes.length > 0;
 
@@ -30,11 +29,11 @@ export function PortfolioView() {
           label="Day P&L"
           value={quoted ? signedMoney(portfolio.dayPnl) : "—"}
           tone={portfolio.dayPnl >= 0 ? "jade" : "coral"}
-          detail="Marked to latest LTP"
+          detail="Based on latest price"
         />
       </div>
 
-      <Panel label="Risk composition" title="Allocation by holding">
+      <Panel label="Where your money is" title="Portfolio allocation">
         {portfolio.positions.length === 0 ? (
           <EmptyState>No holdings yet — add a position on the right.</EmptyState>
         ) : (
@@ -63,7 +62,7 @@ export function PortfolioView() {
       </Panel>
 
       <div className="grid gap-5 lg:grid-cols-3">
-        <Panel label="Book of positions" title="Holdings" className="lg:col-span-2">
+        <Panel label="Your stocks" title="Holdings" className="lg:col-span-2">
           {portfolio.positions.length === 0 ? (
             <EmptyState>The book is empty.</EmptyState>
           ) : (
@@ -71,7 +70,7 @@ export function PortfolioView() {
               <table className="w-full min-w-[940px] border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-hairline text-left">
-                    {["Instrument", "Qty", "Avg", "LTP", "Session", "Value", "Unrealized", "TV", ""].map((heading) => (
+                    {["Stock", "Qty", "Buy price", "Current", "Today", "Value", "Profit / Loss", "Chart", ""].map((heading) => (
                       <th key={heading} className="label-mono pb-3 pr-4 font-medium">
                         {heading}
                       </th>
@@ -101,7 +100,12 @@ export function PortfolioView() {
                           </p>
                         </td>
                         <td className="py-3 pr-4">
-                          <TradingViewLink symbol={position.symbol} compact />
+                          <button
+                            onClick={() => selectSymbol(position.symbol)}
+                            className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                          >
+                            View
+                          </button>
                         </td>
                         <td className="py-3 text-right">
                           <button
@@ -148,7 +152,7 @@ function AddHolding({ onSubmit }: { onSubmit: (holding: { symbol: string; quanti
   }
 
   return (
-    <Panel label="Trade ledger" title="Add a holding">
+    <Panel label="Add stock to portfolio" title="Add holding">
       <form onSubmit={submit} className="space-y-3">
         <div>
           <p className="label-mono mb-1.5">Symbol</p>

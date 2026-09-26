@@ -2,7 +2,6 @@
 
 import clsx from "clsx";
 import { Pause, Play, Trash2 } from "lucide-react";
-import { TradingViewLink } from "@/components/TradingViewLink";
 import { Dot, Pill } from "@/components/ui";
 import { isAlertTriggered } from "@/lib/logic/alerts";
 import { displaySymbol, money, price, sessionDate } from "@/lib/logic/format";
@@ -48,7 +47,12 @@ export function AlertList({ limit }: { limit?: number }) {
             <span className="hidden text-[10px] text-paper-faint sm:block">{sessionDate(alert.createdAt)}</span>
             <Pill tone={alert.active ? (triggered ? "brass" : "steel") : "neutral"}>{alert.active ? (triggered ? "Fired" : "Armed") : "Paused"}</Pill>
             <span className="hidden text-[10px] uppercase tracking-wider text-paper-faint md:block">{alert.createdBy}</span>
-            <TradingViewLink symbol={alert.symbol} compact />
+            <button
+              onClick={() => selectSymbol(alert.symbol)}
+              className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+            >
+              Chart
+            </button>
             <div className="flex items-center gap-1 opacity-40 transition-opacity group-hover:opacity-100">
               <button onClick={() => toggleAlert(alert.id)} title={alert.active ? "Pause" : "Resume"} className="rounded p-1.5 text-paper-dim hover:bg-ink-800 hover:text-paper">
                 {alert.active ? <Pause size={14} /> : <Play size={14} />}

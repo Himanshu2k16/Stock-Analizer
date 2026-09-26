@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { Area, Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { TradingViewLink } from "@/components/TradingViewLink";
 import type { MarketQuote } from "@/types/investment";
 import { compact, displaySymbol, price, shortDate } from "@/lib/logic/format";
 
@@ -27,25 +26,22 @@ export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; heigh
     <div>
       <div className="mb-4 flex items-center justify-between">
         <p className="label-mono">
-          Price path · {displaySymbol(quote?.symbol ?? "")} · candles with EMA overlays
+          Simple price chart · {displaySymbol(quote?.symbol ?? "")}
         </p>
-        <div className="flex flex-wrap items-center gap-2">
-          {quote?.symbol && <TradingViewLink symbol={quote.symbol} />}
-          <div className="flex gap-1 rounded-md border border-hairline bg-ink-950/70 p-1">
-            {ranges.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setRange(item.id)}
-                className={
-                  item.id === range
-                    ? "rounded bg-brass-deep px-2.5 py-1 font-mono text-[10px] uppercase text-brass-bright"
-                    : "rounded px-2.5 py-1 font-mono text-[10px] uppercase text-paper-faint transition-colors hover:text-paper-dim"
-                }
-              >
-                {item.id}
-              </button>
-            ))}
-          </div>
+        <div className="flex gap-1 rounded-md border border-hairline bg-ink-950/70 p-1">
+          {ranges.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setRange(item.id)}
+              className={
+                item.id === range
+                  ? "rounded bg-brass-deep px-2.5 py-1 font-mono text-[10px] uppercase text-brass-bright"
+                  : "rounded px-2.5 py-1 font-mono text-[10px] uppercase text-paper-faint transition-colors hover:text-paper-dim"
+              }
+            >
+              {item.id}
+            </button>
+          ))}
         </div>
       </div>
 

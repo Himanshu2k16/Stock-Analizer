@@ -62,7 +62,7 @@ export function CommandView() {
         <div className="space-y-5">
           <Panel
             label="Alert operations"
-            title="Desk signals"
+            title="Price alerts"
             actions={
               <Link href="/alerts">
                 <Button variant="secondary">Manage</Button>
@@ -73,8 +73,8 @@ export function CommandView() {
           </Panel>
 
           <Panel
-            label="EMA 200 retest"
-            title="Scanner snapshot"
+            label="Stock ideas"
+            title="Latest screener matches"
             actions={
               <Link href="/scanner">
                 <Button variant="secondary">Studio</Button>
@@ -109,7 +109,7 @@ export function CommandView() {
       </div>
 
       <div className="lg:col-span-1">
-        <NewsList label="Google News · last 7 days" title="Market headlines" url={newsUrl} />
+        <NewsList label="Google News · last 7 days" title="Latest market news" url={newsUrl} />
       </div>
     </div>
   );

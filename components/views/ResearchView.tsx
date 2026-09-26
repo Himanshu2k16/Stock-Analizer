@@ -20,7 +20,7 @@ export function ResearchView() {
 
   return (
     <div className="space-y-5">
-      <Panel label="Evidence chain" title="Decision log" actions={<Brain size={16} className="text-brass" />}>
+      <Panel label="Quick summary" title="What changed?" actions={<Brain size={16} className="text-brass" />}>
         <div className="grid gap-3 lg:grid-cols-3">
           <Entry tone="steel" label="Fact">
             {selectedQuote
@@ -41,8 +41,8 @@ export function ResearchView() {
       </Panel>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <NewsList label="Watchlist coverage" title="Market headlines" url={newsUrl} />
-        <NewsList label="Primary markets" title="IPO wire" url="/api/market/ipo" />
+        <NewsList label="Your watchlist" title="Latest market news" url={newsUrl} />
+        <NewsList label="New listings" title="IPO news" url="/api/market/ipo" />
       </div>
     </div>
   );

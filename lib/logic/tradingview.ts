@@ -9,8 +9,3 @@ export function tradingViewSymbol(symbol: string) {
 
   return clean;
 }
-
-export function tradingViewUrl(symbol: string) {
-  const tvSymbol = tradingViewSymbol(symbol);
-  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol)}`;
-}

@@ -2,14 +2,15 @@
 
 import { Panel, Pill } from "@/components/ui";
 import { PriceChart } from "@/components/PriceChart";
-import { TradingViewLink } from "@/components/TradingViewLink";
+import { TradingViewWidget } from "@/components/TradingViewWidget";
 import type { MarketQuote } from "@/types/investment";
 import { clockTime, compact, price, signedPercent } from "@/lib/logic/format";
+import { tradingViewSymbol } from "@/lib/logic/tradingview";
 
 export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
   if (!quote) {
     return (
-      <Panel label="Instrument" title="No symbol selected">
+      <Panel label="Stock chart" title="Choose a stock">
         <PriceChart quote={undefined} />
       </Panel>
     );
@@ -25,18 +26,17 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
       title={quote.name}
       actions={
         <>
-          <Pill tone="brass">LTP {clockTime(quote.timestamp)}</Pill>
-          <Pill tone={up ? "jade" : "coral"}>{signedPercent(quote.changePercent)} session</Pill>
-          <TradingViewLink symbol={quote.symbol} />
+          <Pill tone="brass">Updated {clockTime(quote.timestamp)}</Pill>
+          <Pill tone={up ? "jade" : "coral"}>{signedPercent(quote.changePercent)} today</Pill>
         </>
       }
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brass/30 bg-brass-deep px-4 py-3">
         <div>
-          <p className="label-mono">Real TradingView chart</p>
-          <p className="mt-1 text-sm text-paper-dim">Candles, drawings, indicators, zoom and saved layouts open on TradingView.</p>
+          <p className="label-mono">Full TradingView chart inside this app</p>
+          <p className="mt-1 text-sm text-paper-dim">Candles, drawing tools, indicators, volume and zoom for {tradingViewSymbol(quote.symbol)}.</p>
         </div>
-        <TradingViewLink symbol={quote.symbol} featured />
+        <Pill tone="brass">Live widget</Pill>
       </div>
 
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
@@ -47,7 +47,6 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
               {up ? "▲" : "▼"} {price(Math.abs(quote.change), quote.currency)}
             </span>
           </p>
-          <TradingViewLink symbol={quote.symbol} className="mb-1 h-9 px-4" />
         </div>
         <div className="grid w-full max-w-md grid-cols-2 gap-x-8 gap-y-3">
           <RangeBar label="Day range" low={quote.dayLow} high={quote.dayHigh} position={dayPosition} currency={quote.currency} />
@@ -61,6 +60,10 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
         <Metric term="Day high" value={quote.dayHigh !== undefined ? price(quote.dayHigh, quote.currency) : "—"} />
         <Metric term="Volume" value={compact(quote.volume)} />
       </dl>
+
+      <div className="mb-6">
+        <TradingViewWidget symbol={quote.symbol} />
+      </div>
 
       <PriceChart quote={quote} />
     </Panel>
