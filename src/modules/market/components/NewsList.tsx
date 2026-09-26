@@ -36,7 +36,7 @@ export function NewsList({ label, title, url }: { label: string; title: string; 
                 </p>
                 <p className="text-sm leading-snug text-paper-dim transition-colors group-hover:text-paper">{article.title}</p>
               </div>
-              <ArrowUpRight size={15} className="mt-1 shrink-0 text-paper-faint transition-colors group-hover:text-brass-bright" />
+              <ArrowUpRight size={15} className="mt-1 shrink-0 text-paper-faint transition-colors group-hover:text-accent-bright" />
             </a>
           </li>
         ))}

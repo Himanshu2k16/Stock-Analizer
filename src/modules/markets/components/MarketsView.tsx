@@ -40,11 +40,11 @@ export function MarketsView() {
                       onClick={() => selectSymbol(quote.symbol)}
                       className={clsx(
                         "group cursor-pointer border-b border-hairline/60 transition-colors last:border-0",
-                        active ? "bg-brass-deep/70" : "hover:bg-ink-850",
+                        active ? "bg-accent-deep/70" : "hover:bg-ink-850",
                       )}
                     >
                       <td className="py-3 pr-4">
-                        <p className={clsx("font-mono text-xs uppercase", active ? "text-brass-bright" : "text-paper")}>
+                        <p className={clsx("font-mono text-xs uppercase", active ? "text-accent-bright" : "text-paper")}>
                           {displaySymbol(quote.symbol)}
                         </p>
                         <p className="mt-0.5 max-w-52 truncate text-[11px] text-paper-faint">{quote.name}</p>
@@ -63,7 +63,7 @@ export function MarketsView() {
                             event.stopPropagation();
                             selectSymbol(quote.symbol);
                           }}
-                          className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                          className="rounded-md border border-accent/35 bg-accent-deep px-3 py-1.5 text-[12px] font-medium text-accent-bright hover:bg-accent hover:text-white"
                         >
                           View chart
                         </button>

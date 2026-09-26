@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { Pause, Play, Trash2 } from "lucide-react";
 import { Dot, Pill } from "@/components/ui";
 import { isAlertTriggered } from "../lib/alerts";
@@ -9,11 +10,17 @@ import { useMarket } from "@/modules/market";
 
 export function AlertList({ limit }: { limit?: number }) {
   const { alerts, quotes, toggleAlert, removeAlert, selectSymbol } = useMarket();
+  const router = useRouter();
   const quoteMap = new Map(quotes.map((quote) => [quote.symbol, quote]));
   const visible = limit ? alerts.slice(0, limit) : alerts;
 
   if (visible.length === 0) {
     return <p className="py-8 text-center text-sm text-paper-faint">No alert rules yet.</p>;
+  }
+
+  function openChart(symbol: string) {
+    selectSymbol(symbol);
+    router.push(`/chart?symbol=${encodeURIComponent(symbol)}`);
   }
 
   return (
@@ -26,30 +33,28 @@ export function AlertList({ limit }: { limit?: number }) {
           <li
             key={alert.id}
             className={clsx(
-              "group flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors",
-              triggered ? "border-brass/45 bg-brass-deep shadow-[0_0_30px_-24px_rgba(32,199,223,0.8)]" : "border-hairline bg-ink-900/90 hover:border-hairline-strong hover:bg-ink-850",
+              "group flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border px-4 py-3 transition-colors",
+              triggered ? "border-accent/45 bg-accent-deep shadow-[0_0_30px_-24px_rgba(32,199,223,0.8)]" : "border-hairline bg-ink-900/90 hover:border-hairline-strong hover:bg-ink-850",
             )}
           >
             <Dot on={triggered} className={clsx(triggered && "animate-pulse")} />
-            <button
-              onClick={() => selectSymbol(alert.symbol)}
-              className="min-w-0 flex-1 text-left"
-              title="Open chart"
-            >
-              <p className="font-mono text-xs uppercase text-paper">
+            <button onClick={() => openChart(alert.symbol)} className="min-w-0 flex-1 basis-52 text-left" title="Open TradingView chart">
+              <p className="truncate whitespace-nowrap font-mono text-xs uppercase text-paper">
                 {displaySymbol(alert.symbol)} <span className="text-paper-faint">{alert.operator}</span> {money(alert.threshold)}
               </p>
-              <p className="num mt-1 text-[11px] text-paper-faint">
+              <p className="num mt-1 truncate whitespace-nowrap text-[11px] text-paper-faint">
                 {quote ? `Live ${price(quote.price, quote.currency)}` : "Awaiting quote"}
                 {distance !== undefined && ` · ${(distance >= 0 ? "+" : "") + distance.toFixed(1)}% from line`}
+                <span className="text-paper-faint/60">
+                  {" "}
+                  · {sessionDate(alert.createdAt)} · {alert.createdBy}
+                </span>
               </p>
             </button>
-            <span className="hidden text-[10px] text-paper-faint sm:block">{sessionDate(alert.createdAt)}</span>
-            <Pill tone={alert.active ? (triggered ? "brass" : "steel") : "neutral"}>{alert.active ? (triggered ? "Fired" : "Armed") : "Paused"}</Pill>
-            <span className="hidden text-[10px] uppercase tracking-wider text-paper-faint md:block">{alert.createdBy}</span>
+            <Pill tone={alert.active ? (triggered ? "accent" : "steel") : "neutral"}>{alert.active ? (triggered ? "Fired" : "Armed") : "Paused"}</Pill>
             <button
-              onClick={() => selectSymbol(alert.symbol)}
-              className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+              onClick={() => openChart(alert.symbol)}
+              className="rounded-md border border-accent/35 bg-accent-deep px-3 py-1.5 text-[12px] font-medium text-accent-bright hover:bg-accent hover:text-white"
             >
               Chart
             </button>

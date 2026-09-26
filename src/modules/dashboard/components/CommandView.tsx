@@ -23,37 +23,50 @@ export function CommandView() {
 
   const firstSync = loading && quotes.length === 0;
 
+  const stagger = (delay: number, extra = "") => ({
+    className: `animate-fade-up${extra ? ` ${extra}` : ""}`,
+    style: { animationDelay: `${delay}ms` },
+  });
+
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+    <div className="space-y-10">
+      <div className="grid grid-cols-2 gap-y-10 border-y border-hairline py-9 xl:grid-cols-4 xl:divide-x xl:divide-hairline">
         {firstSync ? (
           <SkeletonGrid count={4} className="col-span-2 xl:col-span-4" />
         ) : (
           <>
-            <Stat label="Portfolio value" value={money(portfolio.totalValue)} detail={`${portfolio.positions.length} tracked holdings`} />
-            <Stat
-              label="Day P&L"
-              value={signedMoney(portfolio.dayPnl)}
-              tone={portfolio.dayPnl >= 0 ? "jade" : "coral"}
-              detail={<Delta percent={portfolioValuePercent(portfolio.totalValue, portfolio.dayPnl)} />}
-            />
-            <Stat
-              label="Unrealized P&L"
-              value={signedMoney(portfolio.unrealizedPnl)}
-              tone={portfolio.unrealizedPnl >= 0 ? "jade" : "coral"}
-              detail={<span className="num">{signedPercent(unrealizedPercent)} on cost</span>}
-            />
-            <Stat
-              label="Alert desk"
-              value={`${fired.length} fired`}
-              tone={fired.length ? "brass" : undefined}
-              detail={`${armed} of ${alerts.length} rules armed`}
-            />
+            <div {...stagger(0, "xl:pr-10")}>
+              <Stat label="Portfolio value" value={money(portfolio.totalValue)} detail={`${portfolio.positions.length} tracked holdings`} />
+            </div>
+            <div {...stagger(70, "xl:px-10")}>
+              <Stat
+                label="Day P&L"
+                value={signedMoney(portfolio.dayPnl)}
+                tone={portfolio.dayPnl >= 0 ? "jade" : "coral"}
+                detail={<Delta percent={portfolioValuePercent(portfolio.totalValue, portfolio.dayPnl)} />}
+              />
+            </div>
+            <div {...stagger(140, "xl:px-10")}>
+              <Stat
+                label="Unrealized P&L"
+                value={signedMoney(portfolio.unrealizedPnl)}
+                tone={portfolio.unrealizedPnl >= 0 ? "jade" : "coral"}
+                detail={<span className="num">{signedPercent(unrealizedPercent)} on cost</span>}
+              />
+            </div>
+            <div {...stagger(210, "xl:px-10")}>
+              <Stat
+                label="Alert desk"
+                value={`${fired.length} fired`}
+                tone={fired.length ? "accent" : undefined}
+                detail={`${armed} of ${alerts.length} rules armed`}
+              />
+            </div>
           </>
         )}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div {...stagger(260, "grid gap-5 lg:grid-cols-3")}>
         <div className="lg:col-span-2">{firstSync ? <SkeletonGrid className="h-[540px]" /> : <InstrumentPanel quote={selectedQuote} />}</div>
 
         <div className="space-y-5">
@@ -96,7 +109,7 @@ export function CommandView() {
                       <p className="num text-xs text-paper">{price(match.price)}</p>
                       <Delta percent={match.changePercent} />
                     </div>
-                    <span className="num w-9 text-right text-sm text-brass-bright">{match.score}</span>
+                    <span className="num w-9 text-right text-sm text-accent-bright">{match.score}</span>
                   </li>
                 ))}
               </ul>
@@ -105,7 +118,7 @@ export function CommandView() {
         </div>
       </div>
 
-      <div className="lg:col-span-1">
+      <div {...stagger(330, "lg:col-span-1")}>
         <NewsList label="Google News · last 7 days" title="Latest market news" url={newsUrl} />
       </div>
     </div>

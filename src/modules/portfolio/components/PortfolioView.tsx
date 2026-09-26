@@ -7,7 +7,7 @@ import { Button, Delta, EmptyState, Panel, Stat, TextField, inputClass } from "@
 import { displaySymbol, money, price, signedMoney, signedPercent } from "@/lib/format";
 import { useMarket } from "@/modules/market";
 
-const palette = ["#20c7df", "#26d983", "#ff5f5f", "#f4b860", "#7c5cff", "#38bdf8", "#f472b6", "#a3e635"];
+const palette = ["#2962ff", "#22c55e", "#ef4444", "#f59e0b", "#8b7cf6", "#64748b", "#ec4899", "#14b8a6"];
 
 export function PortfolioView() {
   const { portfolio, quotes, holdings, addHolding, removeHolding, addSymbol, selectSymbol } = useMarket();
@@ -15,22 +15,30 @@ export function PortfolioView() {
   const quoted = quotes.length > 0;
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        <Stat label="Market value" value={quoted ? money(portfolio.totalValue) : "—"} detail={`${holdings.length} positions`} />
-        <Stat label="Cost basis" value={money(portfolio.totalCost)} detail="Capital deployed" />
-        <Stat
-          label="Unrealized P&L"
-          value={quoted ? signedMoney(portfolio.unrealizedPnl) : "—"}
-          tone={portfolio.unrealizedPnl >= 0 ? "jade" : "coral"}
-          detail={<span className="num">{signedPercent(unrealizedPercent)} on cost</span>}
-        />
-        <Stat
-          label="Day P&L"
-          value={quoted ? signedMoney(portfolio.dayPnl) : "—"}
-          tone={portfolio.dayPnl >= 0 ? "jade" : "coral"}
-          detail="Based on latest price"
-        />
+    <div className="space-y-10">
+      <div className="grid grid-cols-2 gap-y-10 border-y border-hairline py-9 xl:grid-cols-4 xl:divide-x xl:divide-hairline">
+        <div className="xl:pr-10">
+          <Stat label="Market value" value={quoted ? money(portfolio.totalValue) : "—"} detail={`${holdings.length} positions`} />
+        </div>
+        <div className="xl:px-10">
+          <Stat label="Cost basis" value={money(portfolio.totalCost)} detail="Capital deployed" />
+        </div>
+        <div className="xl:px-10">
+          <Stat
+            label="Unrealized P&L"
+            value={quoted ? signedMoney(portfolio.unrealizedPnl) : "—"}
+            tone={portfolio.unrealizedPnl >= 0 ? "jade" : "coral"}
+            detail={<span className="num">{signedPercent(unrealizedPercent)} on cost</span>}
+          />
+        </div>
+        <div className="xl:px-10">
+          <Stat
+            label="Day P&L"
+            value={quoted ? signedMoney(portfolio.dayPnl) : "—"}
+            tone={portfolio.dayPnl >= 0 ? "jade" : "coral"}
+            detail="Based on latest price"
+          />
+        </div>
       </div>
 
       <Panel label="Where your money is" title="Portfolio allocation">
@@ -102,7 +110,7 @@ export function PortfolioView() {
                         <td className="py-3 pr-4">
                           <button
                             onClick={() => selectSymbol(position.symbol)}
-                            className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                            className="rounded-md border border-accent/35 bg-accent-deep px-3 py-1.5 text-[12px] font-medium text-accent-bright hover:bg-accent hover:text-white"
                           >
                             View
                           </button>

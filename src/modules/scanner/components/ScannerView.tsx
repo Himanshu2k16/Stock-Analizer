@@ -42,13 +42,13 @@ export function ScannerView() {
             className={clsx(
               "rounded-panel border p-4 text-left transition-all duration-200",
               item.id === template
-                ? "border-brass/45 bg-brass-deep shadow-[0_0_32px_-20px_rgba(32,199,223,0.75)]"
+                ? "border-accent/45 bg-accent-deep shadow-[0_0_32px_-20px_rgba(32,199,223,0.75)]"
                 : "border-hairline bg-ink-900/90 hover:border-hairline-strong hover:bg-ink-850",
             )}
           >
             <div className="flex items-center justify-between">
-              <p className={clsx("font-display text-lg", item.id === template ? "text-brass-bright" : "text-paper")}>{item.name}</p>
-              <Pill tone={item.id === template ? "brass" : "neutral"}>{item.tagline}</Pill>
+              <p className={clsx("font-display text-lg", item.id === template ? "text-accent-bright" : "text-paper")}>{item.name}</p>
+              <Pill tone={item.id === template ? "accent" : "neutral"}>{item.tagline}</Pill>
             </div>
             <p className="mt-2 text-xs leading-relaxed text-paper-faint">{item.description}</p>
           </button>
@@ -60,13 +60,13 @@ export function ScannerView() {
           <div className="space-y-2.5">
             {active.filters.map((filter, index) => (
               <div key={filter} className="flex items-start gap-3 rounded-lg border border-hairline bg-ink-950/55 px-4 py-3">
-                <span className="num mt-0.5 text-xs text-brass">{String(index + 1).padStart(2, "0")}</span>
+                <span className="num mt-0.5 text-xs text-accent">{String(index + 1).padStart(2, "0")}</span>
                 <p className="text-sm leading-snug text-paper-dim">{filter}</p>
               </div>
             ))}
           </div>
           <p className="mt-4 text-xs leading-relaxed text-paper-faint">
-            A symbol passes when <em className="not-italic text-brass-bright">every</em> filter holds on the latest completed session. Intraday
+            A symbol passes when <em className="not-italic text-accent-bright">every</em> filter holds on the latest completed session. Intraday
             candles repaint — the scan treats the last bar as provisional.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ export function ScannerView() {
           label="Stocks checked"
           title={`${result?.matches.length ?? 0} match${result?.matches.length === 1 ? "" : "es"} of ${result?.universe ?? "…"}`}
           className="lg:col-span-2"
-          actions={<Pill tone="brass">{result ? `Synced ${clockTime(result.fetchedAt)}` : loading ? "Running" : "Idle"}</Pill>}
+          actions={<Pill tone="accent">{result ? `Synced ${clockTime(result.fetchedAt)}` : loading ? "Running" : "Idle"}</Pill>}
         >
           {loading && !result ? (
             <SkeletonGrid count={4} className="grid-cols-1" />
@@ -108,7 +108,7 @@ export function ScannerView() {
                     <tr key={match.symbol} className="group border-b border-hairline/60 transition-colors last:border-0 hover:bg-ink-850">
                       <td className="py-3 pr-4">
                         <button onClick={() => selectSymbol(match.symbol)} className="text-left">
-                          <p className="font-mono text-xs uppercase text-paper group-hover:text-brass-bright">
+                          <p className="font-mono text-xs uppercase text-paper group-hover:text-accent-bright">
                             {displaySymbol(match.symbol)}
                           </p>
                           <p className="mt-0.5 text-[11px] text-paper-faint">{match.signal}</p>
@@ -126,15 +126,15 @@ export function ScannerView() {
                       <td className="py-3 pr-4">
                         <div className="flex items-center gap-2">
                           <span className="h-1 w-14 overflow-hidden rounded-full bg-ink-800">
-                            <span className="block h-full rounded-full bg-brass" style={{ width: `${match.score}%` }} />
+                            <span className="block h-full rounded-full bg-accent" style={{ width: `${match.score}%` }} />
                           </span>
-                          <span className="num text-xs text-brass-bright">{match.score}</span>
+                          <span className="num text-xs text-accent-bright">{match.score}</span>
                         </div>
                       </td>
                       <td className="py-3 pr-4">
                         <button
                           onClick={() => selectSymbol(match.symbol)}
-                          className="rounded-md border border-brass/35 bg-brass-deep px-3 py-1.5 font-mono text-[10px] uppercase text-brass-bright hover:bg-brass hover:text-ink-950"
+                          className="rounded-md border border-accent/35 bg-accent-deep px-3 py-1.5 text-[12px] font-medium text-accent-bright hover:bg-accent hover:text-white"
                         >
                           View
                         </button>
@@ -143,7 +143,7 @@ export function ScannerView() {
                         <button
                           onClick={() => armAlert(match.symbol, Number((match.ema200 ?? match.price).toFixed(2)))}
                           title="Arm alert at EMA 200"
-                          className="rounded p-1.5 text-paper-faint opacity-0 transition-opacity group-hover:opacity-100 hover:bg-brass-deep hover:text-brass-bright focus:opacity-100"
+                          className="rounded p-1.5 text-paper-faint opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent-deep hover:text-accent-bright focus:opacity-100"
                         >
                           <Bell size={14} />
                         </button>

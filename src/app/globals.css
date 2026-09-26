@@ -1,41 +1,136 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink-950: #061018;
-  --color-ink-900: #0a1622;
-  --color-ink-850: #0f2030;
-  --color-ink-800: #142b3d;
-  --color-ink-700: #1c3a4f;
-  --color-hairline: rgba(125, 211, 252, 0.1);
-  --color-hairline-strong: rgba(125, 211, 252, 0.2);
-  --color-paper: #edf7ff;
-  --color-paper-dim: #a5b6c8;
-  --color-paper-faint: #66798d;
-  --color-brass: #20c7df;
-  --color-brass-bright: #7de7ff;
-  --color-brass-deep: rgba(32, 199, 223, 0.14);
-  --color-jade: #26d983;
-  --color-jade-deep: rgba(38, 217, 131, 0.12);
-  --color-coral: #ff5f5f;
-  --color-coral-deep: rgba(255, 95, 95, 0.12);
-  --color-steel: #f4b860;
+  --color-ink-950: #0b0e14;
+  --color-ink-900: #10141c;
+  --color-ink-850: #151b26;
+  --color-ink-800: #1c2430;
+  --color-ink-700: #29323f;
+  --color-hairline: rgba(255, 255, 255, 0.07);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
+  --color-paper: #efeee8;
+  --color-paper-dim: #a7a8a0;
+  --color-paper-faint: #70716a;
+  --color-accent: #2962ff;
+  --color-accent-bright: #7aa5ff;
+  --color-accent-deep: rgba(41, 98, 255, 0.14);
+  --color-jade: #22c55e;
+  --color-jade-deep: rgba(34, 197, 94, 0.12);
+  --color-coral: #ef4444;
+  --color-coral-deep: rgba(239, 68, 68, 0.12);
+  --color-steel: #f59e0b;
 
-  --font-display: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
 
   --radius-panel: 8px;
 
-  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-up: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-drift: drift 22s ease-in-out infinite alternate;
+  --animate-drift-slow: drift 34s ease-in-out infinite alternate-reverse;
+  --animate-float-y: float-y 7s ease-in-out infinite;
+  --animate-bob: bob 5.5s ease-in-out infinite;
+  --animate-ring-pulse: ring-pulse 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  --animate-grow-x: grow-x 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-bar-dance: bar-dance 1.8s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 3.2s ease-in-out infinite;
 
   @keyframes fade-up {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes drift {
+    from {
+      transform: translate3d(-4%, -3%, 0) scale(1);
+    }
+    to {
+      transform: translate3d(5%, 4%, 0) scale(1.15);
+    }
+  }
+
+  @keyframes float-y {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-1.5deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(-1.5deg);
+    }
+  }
+
+  @keyframes ring-pulse {
+    0% {
+      transform: scale(0.55);
+      opacity: 0.65;
+    }
+    80%,
+    100% {
+      transform: scale(2.3);
+      opacity: 0;
+    }
+  }
+
+  @keyframes draw-line {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes bar-dance {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(41, 98, 255, 0.35);
+    }
+    50% {
+      box-shadow: 0 0 34px 4px rgba(41, 98, 255, 0.45);
     }
   }
 }
@@ -49,27 +144,11 @@
     min-height: 100vh;
     background-color: var(--color-ink-950);
     color: var(--color-paper);
-    background-image:
-      linear-gradient(rgba(125, 211, 252, 0.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(125, 211, 252, 0.022) 1px, transparent 1px),
-      linear-gradient(135deg, #07111a 0%, #061018 44%, #0a1f2c 100%);
-    background-size: 42px 42px, 42px 42px, auto;
-    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    pointer-events: none;
-    opacity: 0.28;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
-  }
-
   ::selection {
-    background: rgba(32, 199, 223, 0.25);
+    background: rgba(41, 98, 255, 0.32);
     color: var(--color-paper);
   }
 
@@ -86,7 +165,7 @@
     border-radius: 8px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-brass-deep);
+    background: var(--color-accent-deep);
   }
 
   input,
@@ -97,20 +176,39 @@
     color: inherit;
   }
 
-  * {
-    letter-spacing: 0 !important;
-  }
-
   input[type="number"]::-webkit-inner-spin-button {
     appearance: none;
   }
 }
 
 @utility label-mono {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--color-paper-faint);
+}
+
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @utility scrollbar-none {
@@ -121,6 +219,6 @@
 }
 
 @utility num {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }

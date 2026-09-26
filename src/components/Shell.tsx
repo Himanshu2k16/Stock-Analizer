@@ -1,157 +1,201 @@
 "use client";
 
 import clsx from "clsx";
-import { Bell, Briefcase, LayoutDashboard, Newspaper, Plus, Radar, RefreshCw, ShieldCheck, TrendingUp } from "lucide-react";
+import { LogOut, Menu, Plus, RefreshCw, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { Dot } from "@/components/ui";
-import { stockSuggestions, useMarketClock, useMarket } from "@/modules/market";
+import { stockSuggestions, useMarket } from "@/modules/market";
+import { useAuth } from "@/modules/auth";
 import { displaySymbol, price } from "@/lib/format";
 
 const nav = [
-  { href: "/", label: "Home", icon: LayoutDashboard },
-  { href: "/markets", label: "Stocks", icon: TrendingUp },
-  { href: "/scanner", label: "Find Stocks", icon: Radar },
-  { href: "/portfolio", label: "My Portfolio", icon: Briefcase },
-  { href: "/alerts", label: "Price Alerts", icon: Bell },
-  { href: "/research", label: "News", icon: Newspaper },
+  { href: "/dashboard", label: "Home" },
+  { href: "/markets", label: "Stocks" },
+  { href: "/scanner", label: "Screener" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/alerts", label: "Alerts" },
+  { href: "/research", label: "News" },
+  { href: "/settings", label: "Settings" },
 ];
 
 const pageMeta: Record<string, { eyebrow: string; title: string }> = {
-  "/": { eyebrow: "Overview", title: "Home" },
+  "/dashboard": { eyebrow: "Overview", title: "Home" },
   "/markets": { eyebrow: "Live prices and charts", title: "Stocks" },
   "/scanner": { eyebrow: "Find opportunities", title: "Stock Screener" },
   "/portfolio": { eyebrow: "Your holdings", title: "My Portfolio" },
   "/alerts": { eyebrow: "Price reminders", title: "Price Alerts" },
   "/research": { eyebrow: "Market updates", title: "News" },
+  "/settings": { eyebrow: "Profile and preferences", title: "Settings" },
 };
 
 export function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { clock, open } = useMarketClock();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const { quotes, refreshing, refresh, selectedSymbol, selectSymbol } = useMarket();
-  const meta = pageMeta[pathname] ?? pageMeta["/"];
+  const meta = pageMeta[pathname] ?? pageMeta["/dashboard"];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  function logoutAndGo() {
+    setProfileOpen(false);
+    setMenuOpen(false);
+    logout();
+    router.push("/login");
+  }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-hairline bg-ink-900/88 px-4 py-6 backdrop-blur lg:flex">
-        <Link href="/" className="group flex items-center gap-3 px-2">
-          <span className="grid size-10 place-items-center rounded-md border border-brass/55 bg-brass-deep font-display text-lg font-semibold text-brass-bright transition-colors group-hover:bg-brass group-hover:text-ink-950">
-            M
-          </span>
-          <span>
-            <strong className="block font-display text-base font-semibold leading-none">Meridian</strong>
-            <span className="label-mono mt-1 block">Stock tracker</span>
-          </span>
-        </Link>
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-40 border-b border-hairline bg-ink-950/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-8 px-4 sm:px-6 lg:px-8">
+          <Link href="/dashboard" className="shrink-0" aria-label="Meridian home">
+            <Image src="/meridian-logo-v3.png" alt="Meridian" width={1376} height={315} priority unoptimized className="h-8 w-auto" />
+          </Link>
 
-        <nav className="mt-10 flex flex-col gap-1.5" aria-label="Main">
-          {nav.map((item, index) => {
-            const active = item.href === pathname;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  "relative flex items-center gap-3 rounded-md px-3 py-2.5 font-mono text-[11px] uppercase transition-colors",
-                  active ? "border border-brass/30 bg-brass-deep text-brass-bright" : "text-paper-faint hover:bg-ink-850 hover:text-paper",
-                )}
-              >
-                <span className={clsx("w-4", active ? "text-brass-bright" : "text-paper-faint")}>{String(index + 1).padStart(2, "0")}</span>
-                <item.icon size={15} strokeWidth={1.6} />
-                {item.label}
-                {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brass" />}
-              </Link>
-            );
-          })}
-        </nav>
+          <AddSymbol />
 
-        <div className="mt-auto space-y-3 px-2">
-          <div className="flex items-center gap-2 border-t border-hairline pt-4 text-[11px] text-paper-dim">
-            <ShieldCheck size={14} strokeWidth={1.6} />
-            <span>No broker execution</span>
-          </div>
-          <p className="text-[10px] leading-relaxed text-paper-faint">
-            Decision support only. Quotes delayed 0–60&nbsp;s via Yahoo Finance.
-          </p>
-        </div>
-      </aside>
-
-      <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-40 border-b border-hairline bg-ink-950/88 backdrop-blur-md">
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 lg:px-8">
-            <div className="min-w-0">
-              <p className="label-mono">{meta.eyebrow}</p>
-              <h1 className="font-display text-2xl font-semibold leading-tight text-paper">{meta.title}</h1>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex items-center gap-2 rounded-full border border-hairline bg-ink-900 px-3 py-1.5 shadow-[0_8px_22px_-20px_rgba(0,0,0,0.9)]">
-                <Dot on={open} className={clsx(open && "animate-pulse")} />
-                <span className="font-mono text-[10px] uppercase text-paper-dim">{open ? "NSE open" : "NSE closed"}</span>
-                <span className="num text-[11px] text-paper-dim">{clock}</span>
-              </span>
-              <AddSymbol />
-              <button
-                onClick={refresh}
-                disabled={refreshing}
-                className="flex h-9 items-center gap-2 rounded-md border border-hairline-strong bg-ink-850/75 px-3 font-mono text-[11px] uppercase text-paper-dim transition-colors hover:border-brass/50 hover:text-brass-bright disabled:opacity-40"
-              >
-                <RefreshCw size={14} className={clsx(refreshing && "animate-spin")} />
-                {refreshing ? "Updating" : "Refresh prices"}
-              </button>
-            </div>
-          </div>
-
-          <nav className="scrollbar-none flex gap-1 overflow-x-auto border-t border-hairline/60 px-3 py-1.5 lg:hidden" aria-label="Mobile">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={clsx(
-                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 font-mono text-[10px] uppercase",
-                  item.href === pathname ? "bg-brass-deep text-brass-bright" : "text-paper-faint",
-                )}
-              >
-                <item.icon size={13} strokeWidth={1.6} />
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="scrollbar-none hidden gap-1 overflow-x-auto border-t border-hairline/60 bg-ink-900/45 px-3 py-1.5 lg:flex">
-            {quotes.map((quote) => {
-              const active = quote.symbol === selectedSymbol;
-              const up = quote.changePercent >= 0;
+          <nav className="ml-auto hidden items-center gap-7 lg:flex" aria-label="Main">
+            {nav.map((item) => {
+              const active = item.href === pathname;
               return (
-                <button
-                  key={quote.symbol}
-                  onClick={() => selectSymbol(quote.symbol)}
+                <Link
+                  key={item.href}
+                  href={item.href}
                   className={clsx(
-                    "flex shrink-0 items-baseline gap-2 rounded-md px-3 py-1.5 transition-colors",
-                    active ? "bg-brass-deep text-brass-bright" : "hover:bg-ink-850",
+                    "text-[14px] transition-colors",
+                    active ? "font-semibold text-paper" : "font-medium text-paper-dim hover:text-paper",
                   )}
                 >
-                  <span className={clsx("font-mono text-[10px] uppercase", active ? "text-brass-bright" : "text-paper-dim")}>
-                    {displaySymbol(quote.symbol)}
-                  </span>
-                  <span className="num text-[11px] text-paper">{price(quote.price, quote.currency)}</span>
-                  <span className={clsx("num text-[10px]", up ? "text-jade" : "text-coral")}>
-                    {up ? "+" : "−"}
-                    {Math.abs(quote.changePercent).toFixed(2)}%
-                  </span>
-                </button>
+                  {item.label}
+                </Link>
               );
             })}
-            {quotes.length === 0 && <span className="label-mono px-3 py-1.5">Awaiting first sync…</span>}
-          </div>
-        </header>
+          </nav>
 
-        <main className="lg:px-8">
-          <div key={pathname} className="animate-fade-up mx-auto max-w-[1500px] px-4 py-6 pb-16 lg:px-0">{children}</div>
-        </main>
-      </div>
+          {user && (
+            <div className="relative hidden sm:block">
+              <button
+                onClick={() => setProfileOpen((v) => !v)}
+                aria-label="Open profile menu"
+                className="flex size-9 items-center justify-center rounded-full bg-accent text-[13px] font-semibold text-white transition-transform hover:scale-105"
+              >
+                {user.name.slice(0, 1).toUpperCase()}
+              </button>
+              {profileOpen && (
+                <>
+                  <button aria-hidden className="fixed inset-0 z-40 cursor-default" onClick={() => setProfileOpen(false)} />
+                  <div className="absolute right-0 top-12 z-50 w-60 overflow-hidden rounded-xl border border-hairline-strong bg-ink-900 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)]">
+                    <div className="border-b border-hairline px-4 py-3.5">
+                      <p className="text-[13px] font-semibold text-paper">{user.name}</p>
+                      <p className="mt-0.5 truncate text-[11px] text-paper-faint">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={refresh}
+                      disabled={refreshing}
+                      className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-[13px] font-medium text-paper-dim transition-colors hover:bg-white/[0.04] hover:text-paper disabled:opacity-40"
+                    >
+                      <RefreshCw size={14} className={clsx(refreshing && "animate-spin")} />
+                      {refreshing ? "Updating…" : "Refresh prices"}
+                    </button>
+                    <button
+                      onClick={logoutAndGo}
+                      className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-[13px] font-medium text-coral transition-colors hover:bg-coral-deep"
+                    >
+                      <LogOut size={14} /> Log out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="flex size-9 items-center justify-center rounded-md text-paper-dim transition-colors hover:text-paper lg:hidden"
+          >
+            {menuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="border-t border-hairline bg-ink-950/95 px-4 pb-5 pt-2 backdrop-blur-xl lg:hidden">
+            <nav className="grid gap-0.5" aria-label="Mobile">
+              {nav.map((item) => {
+                const active = item.href === pathname;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={clsx(
+                      "rounded-md px-3 py-2.5 text-[14px] font-medium transition-colors",
+                      active ? "bg-white/[0.06] text-paper" : "text-paper-dim hover:bg-white/[0.03] hover:text-paper",
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            {user && (
+              <button
+                onClick={logoutAndGo}
+                className="mt-3 flex w-full items-center gap-2.5 border-t border-hairline px-3 pt-3.5 text-[13px] font-medium text-coral"
+              >
+                <LogOut size={14} /> Log out ({user.name})
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="scrollbar-none hidden gap-1 overflow-x-auto border-t border-hairline/60 px-4 py-1.5 sm:flex lg:px-8">
+          {quotes.map((quote) => {
+            const active = quote.symbol === selectedSymbol;
+            const up = quote.changePercent >= 0;
+            return (
+              <button
+                key={quote.symbol}
+                onClick={() => selectSymbol(quote.symbol)}
+                className={clsx(
+                  "flex shrink-0 items-baseline gap-2 rounded-md px-3 py-1.5 transition-colors",
+                  active ? "bg-white/[0.05]" : "hover:bg-white/[0.03]",
+                )}
+              >
+                <span className={clsx("font-mono text-[11px]", active ? "text-accent-bright" : "text-paper-dim")}>
+                  {displaySymbol(quote.symbol)}
+                </span>
+                <span className="num text-[12px] text-paper">{price(quote.price, quote.currency)}</span>
+                <span className={clsx("num text-[11px] font-medium", up ? "text-jade" : "text-coral")}>
+                  {up ? "+" : "−"}
+                  {Math.abs(quote.changePercent).toFixed(2)}%
+                </span>
+              </button>
+            );
+          })}
+          {quotes.length === 0 && <span className="px-3 py-1.5 text-[12px] text-paper-faint">Awaiting first sync…</span>}
+        </div>
+      </header>
+
+      <main className="flex-1">
+        <div key={pathname} className="animate-fade-up mx-auto max-w-[1500px] px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+          <div className="mb-6">
+            <p className="text-[12px] font-medium text-paper-faint">{meta.eyebrow}</p>
+            <h1 className="mt-1 font-display text-[26px] font-semibold leading-tight tracking-tight text-paper">{meta.title}</h1>
+          </div>
+          {children}
+        </div>
+      </main>
+
+      <footer className="border-t border-hairline">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+          <p className="text-[11px] text-paper-faint">Decision support only. Quotes delayed 0–60 s via Yahoo Finance.</p>
+          <p className="text-[11px] text-paper-faint">© 2026 Meridian</p>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -184,7 +228,7 @@ function AddSymbol() {
   }
 
   return (
-    <form onSubmit={submit} className="relative">
+    <form onSubmit={submit} className="relative hidden sm:block">
       <Plus size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-paper-faint" />
       <input
         value={value}
@@ -193,10 +237,10 @@ function AddSymbol() {
         onBlur={() => window.setTimeout(() => setFocused(false), 120)}
         placeholder="Search stock"
         aria-label="Search and add stock"
-        className="h-9 w-48 rounded-md border border-hairline bg-ink-950/70 pl-8 pr-3 text-sm text-paper outline-none transition-colors placeholder:normal-case placeholder:text-paper-faint focus:w-72 focus:border-brass/70 focus:bg-ink-850"
+        className="h-10 w-44 rounded-md border border-hairline bg-ink-950/70 pl-8 pr-3 text-sm text-paper outline-none transition-colors placeholder:text-paper-faint focus:w-56 focus:border-accent/70 focus:bg-ink-850 lg:w-52"
       />
       {focused && value.trim() && (
-        <div className="absolute right-0 top-11 z-50 w-80 overflow-hidden rounded-lg border border-hairline-strong bg-ink-900 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.95)]">
+        <div className="absolute left-0 top-12 z-50 w-80 overflow-hidden rounded-lg border border-hairline-strong bg-ink-900 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.95)]">
           {matches.map((item) => (
             <button
               type="button"
@@ -209,21 +253,18 @@ function AddSymbol() {
             >
               <span>
                 <span className="block text-sm font-medium text-paper">{item.name}</span>
-                <span className="mt-0.5 block font-mono text-[10px] uppercase text-paper-faint">{item.exchange}</span>
+                <span className="mt-0.5 block font-mono text-[10px] text-paper-faint">{item.exchange}</span>
               </span>
-              <span className="font-mono text-xs text-brass-bright">{displaySymbol(item.symbol)}</span>
+              <span className="font-mono text-xs text-accent-bright">{displaySymbol(item.symbol)}</span>
             </button>
           ))}
           {matches.length === 0 && (
-            <button
-              type="submit"
-              className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left hover:bg-ink-850"
-            >
+            <button type="submit" className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left hover:bg-ink-850">
               <span>
                 <span className="block text-sm font-medium text-paper">Add typed symbol</span>
-                <span className="mt-0.5 block text-xs text-paper-faint">Press Enter if you know the exact NSE symbol.</span>
+                <span className="mt-0.5 block text-xs text-paper-faint">Press Enter for the exact NSE symbol.</span>
               </span>
-              <span className="font-mono text-xs text-brass-bright">{value.trim().toUpperCase()}</span>
+              <span className="font-mono text-xs text-accent-bright">{value.trim().toUpperCase()}</span>
             </button>
           )}
         </div>

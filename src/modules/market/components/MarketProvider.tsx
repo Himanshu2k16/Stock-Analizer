@@ -6,7 +6,7 @@ import type { AlertRule } from "@/types/alerts";
 import type { Holding, PortfolioMetrics } from "@/types/portfolio";
 import type { MarketQuote } from "@/types/market";
 import { defaultAlerts, defaultHoldings, defaultWatchlist } from "../lib/seed";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useLocalStorage } from "@/lib/hooks/useLocalStorage";
 import { addIndicators } from "../lib/indicators";
 import { calculatePortfolio } from "@/modules/portfolio/lib/portfolio";
 import { normalizeSymbol } from "@/lib/format";

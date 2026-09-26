@@ -1,11 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import { LineChart } from "lucide-react";
 import { Panel, Pill } from "@/components/ui";
 import { PriceChart } from "./PriceChart";
-import { TradingViewWidget } from "./TradingViewWidget";
 import type { MarketQuote } from "@/types/market";
 import { clockTime, compact, price, signedPercent } from "@/lib/format";
-import { tradingViewSymbol } from "../lib/tradingview";
 
 export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
   if (!quote) {
@@ -26,17 +26,25 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
       title={quote.name}
       actions={
         <>
-          <Pill tone="brass">Updated {clockTime(quote.timestamp)}</Pill>
+          <Pill>Updated {clockTime(quote.timestamp)}</Pill>
           <Pill tone={up ? "jade" : "coral"}>{signedPercent(quote.changePercent)} today</Pill>
         </>
       }
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brass/30 bg-brass-deep px-4 py-3">
-        <div>
-          <p className="label-mono">Full TradingView chart inside this app</p>
-          <p className="mt-1 text-sm text-paper-dim">Candles, drawing tools, indicators, volume and zoom for {tradingViewSymbol(quote.symbol)}.</p>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-hairline-strong bg-white/[0.02] px-4 py-3">
+        <div className="min-w-0">
+          <p className="label-mono">TradingView advanced chart</p>
+          <p className="mt-1 text-sm text-paper-dim">
+            Candles, drawing tools, indicators and volume — full page, right inside Meridian.
+          </p>
         </div>
-        <Pill tone="brass">Live widget</Pill>
+        <Link
+          href={`/chart?symbol=${encodeURIComponent(quote.symbol)}`}
+          className="flex h-9 shrink-0 items-center gap-2 rounded-md border border-accent/45 px-4 text-[13px] font-medium text-accent-bright transition-colors hover:bg-accent hover:text-white"
+        >
+          <LineChart size={14} strokeWidth={1.6} />
+          TradingView chart
+        </Link>
       </div>
 
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
@@ -60,10 +68,6 @@ export function InstrumentPanel({ quote }: { quote?: MarketQuote }) {
         <Metric term="Day high" value={quote.dayHigh !== undefined ? price(quote.dayHigh, quote.currency) : "—"} />
         <Metric term="Volume" value={compact(quote.volume)} />
       </dl>
-
-      <div className="mb-6">
-        <TradingViewWidget symbol={quote.symbol} />
-      </div>
 
       <PriceChart quote={quote} />
     </Panel>
@@ -101,7 +105,7 @@ function RangeBar({
     <div>
       <p className="label-mono mb-2">{label}</p>
       <div className="relative h-1 rounded-full bg-ink-800">
-        <span className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full border border-ink-950 bg-brass shadow-[0_0_14px_rgba(32,199,223,0.45)]" style={{ left: `calc(${(position ?? 0) * 100}% - 5px)` }} />
+        <span className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full border border-ink-950 bg-accent" style={{ left: `calc(${(position ?? 0) * 100}% - 5px)` }} />
       </div>
       <p className="num mt-1.5 flex justify-between text-[10px] text-paper-faint">
         <span>{low !== undefined ? price(low, currency) : "—"}</span>

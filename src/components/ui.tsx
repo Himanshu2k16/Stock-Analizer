@@ -20,8 +20,8 @@ export function Panel({
   return (
     <section
       className={clsx(
-        "rounded-panel border border-hairline bg-ink-900/92",
-        "shadow-[0_1px_0_rgba(125,211,252,0.08)_inset,0_22px_54px_-42px_rgba(0,0,0,0.95)]",
+        "rounded-panel border border-hairline bg-ink-900/90",
+        "shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]",
         className,
       )}
     >
@@ -49,10 +49,10 @@ export function Button({
     <button
       className={clsx(
         "inline-flex h-9 items-center justify-center gap-2 rounded-md px-4",
-        "font-mono text-[11px] uppercase transition-all duration-200",
+        "text-[13px] font-medium transition-all duration-200",
         "disabled:pointer-events-none disabled:opacity-40",
-        variant === "primary" && "bg-brass text-ink-950 hover:bg-brass-bright",
-        variant === "secondary" && "border border-hairline-strong bg-ink-850/70 text-paper-dim hover:border-brass/50 hover:text-brass-bright",
+        variant === "primary" && "bg-accent text-white hover:bg-accent-bright",
+        variant === "secondary" && "border border-hairline-strong text-paper-dim hover:border-accent/50 hover:text-accent-bright",
         variant === "ghost" && "text-paper-faint hover:text-paper",
         variant === "danger" && "text-coral hover:bg-coral-deep",
         className,
@@ -65,7 +65,7 @@ export function Button({
 }
 
 const pillTones = {
-  brass: "border-brass/25 text-brass-bright bg-brass-deep",
+  accent: "border-accent/25 text-accent-bright bg-accent-deep",
   jade: "border-jade/30 text-jade bg-jade-deep",
   coral: "border-coral/30 text-coral bg-coral-deep",
   steel: "border-steel/30 text-steel bg-steel/10",
@@ -76,7 +76,7 @@ export function Pill({ tone = "neutral", className, children }: { tone?: keyof t
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium",
         pillTones[tone],
         className,
       )}
@@ -108,28 +108,28 @@ export function Stat({
   label: string;
   value: ReactNode;
   detail?: ReactNode;
-  tone?: "jade" | "coral" | "brass";
+  tone?: "jade" | "coral" | "accent";
 }) {
   return (
-    <div className="rounded-panel border border-hairline bg-ink-900/92 px-5 py-4 shadow-[0_18px_42px_-34px_rgba(0,0,0,0.85)]">
+    <div>
       <p className="label-mono">{label}</p>
       <p
         className={clsx(
-          "mt-2 font-display text-[24px] font-semibold leading-none tabular-nums",
+          "mt-3 font-display text-[30px] font-semibold leading-none tracking-tight tabular-nums text-paper",
           tone === "jade" && "text-jade",
           tone === "coral" && "text-coral",
-          tone === "brass" && "text-brass-bright",
+          tone === "accent" && "text-accent-bright",
         )}
       >
         {value}
       </p>
-      {detail && <div className="mt-2 text-xs text-paper-dim">{detail}</div>}
+      {detail && <div className="mt-2.5 text-xs text-paper-dim">{detail}</div>}
     </div>
   );
 }
 
 export const inputClass =
-  "h-9 w-full rounded-md border border-hairline bg-ink-950/70 px-3 text-sm text-paper outline-none transition-colors placeholder:text-paper-faint focus:border-brass/70 focus:bg-ink-850";
+  "h-9 w-full rounded-md border border-hairline bg-ink-950/70 px-3 text-sm text-paper outline-none transition-colors placeholder:text-paper-faint focus:border-accent/70 focus:bg-ink-850";
 
 export function TextField(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, ...rest } = props;

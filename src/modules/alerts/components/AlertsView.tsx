@@ -54,7 +54,7 @@ function Composer() {
   }
 
   return (
-    <Panel label="Type what you want" title="Create alert" actions={<Sparkles size={16} className="text-brass" />}>
+    <Panel label="Type what you want" title="Create alert" actions={<Sparkles size={16} className="text-accent" />}>
       <form onSubmit={submit} className="space-y-3">
         <textarea
           value={text}
@@ -62,7 +62,7 @@ function Composer() {
           rows={3}
           placeholder="Alert me when Tata Steel slips below 150…"
           aria-label="Describe an alert in plain language"
-          className="w-full resize-none rounded-md border border-hairline bg-ink-950/70 px-3 py-2.5 text-sm leading-relaxed outline-none transition-colors placeholder:text-paper-faint focus:border-brass/70 focus:bg-ink-850"
+          className="w-full resize-none rounded-md border border-hairline bg-ink-950/70 px-3 py-2.5 text-sm leading-relaxed outline-none transition-colors placeholder:text-paper-faint focus:border-accent/70 focus:bg-ink-850"
         />
         {feedback && <p className={`text-xs ${feedback.ok ? "text-jade" : "text-coral"}`}>{feedback.message}</p>}
         <Button type="submit" className="w-full">

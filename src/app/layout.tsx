@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Manrope, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { MarketProvider } from "@/modules/market";
-import { Shell } from "@/components/Shell";
+import { AuthProvider } from "@/modules/auth";
 import "./globals.css";
 
 const serif = Instrument_Serif({
@@ -11,9 +11,14 @@ const serif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
-const sans = Instrument_Sans({
+const display = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-instrument-sans",
+  variable: "--font-space-grotesk",
+});
+
+const sans = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
 });
 
 const mono = JetBrains_Mono({
@@ -29,11 +34,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-      <body className="font-sans antialiased">
-        <MarketProvider>
-          <Shell>{children}</Shell>
-        </MarketProvider>
+    <html lang="en" suppressHydrationWarning className={`${serif.variable} ${display.variable} ${sans.variable} ${mono.variable}`}>
+      <body suppressHydrationWarning className="font-sans antialiased">
+        <AuthProvider>
+          <MarketProvider>{children}</MarketProvider>
+        </AuthProvider>
       </body>
     </html>
   );

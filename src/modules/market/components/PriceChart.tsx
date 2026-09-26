@@ -14,7 +14,15 @@ const ranges = [
 
 type RangeId = (typeof ranges)[number]["id"];
 
-export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; height?: number }) {
+export function PriceChart({
+  quote,
+  height = 300,
+  fill = false,
+}: {
+  quote?: MarketQuote;
+  height?: number | `${number}%`;
+  fill?: boolean;
+}) {
   const [range, setRange] = useState<RangeId>("6m");
   const data = useMemo(() => {
     if (!quote) return [];
@@ -23,10 +31,10 @@ export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; heigh
   }, [quote, range]);
 
   return (
-    <div>
+    <div className={fill ? "flex h-full flex-col" : undefined}>
       <div className="mb-4 flex items-center justify-between">
         <p className="label-mono">
-          Simple price chart · {displaySymbol(quote?.symbol ?? "")}
+          Meridian price chart · {displaySymbol(quote?.symbol ?? "")}
         </p>
         <div className="flex gap-1 rounded-md border border-hairline bg-ink-950/70 p-1">
           {ranges.map((item) => (
@@ -35,8 +43,8 @@ export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; heigh
               onClick={() => setRange(item.id)}
               className={
                 item.id === range
-                  ? "rounded bg-brass-deep px-2.5 py-1 font-mono text-[10px] uppercase text-brass-bright"
-                  : "rounded px-2.5 py-1 font-mono text-[10px] uppercase text-paper-faint transition-colors hover:text-paper-dim"
+                  ? "rounded bg-accent-deep px-2.5 py-1 text-[12px] font-medium text-accent-bright"
+                  : "rounded px-2.5 py-1 text-[11px] font-medium text-paper-faint transition-colors hover:text-paper-dim"
               }
             >
               {item.id}
@@ -46,19 +54,20 @@ export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; heigh
       </div>
 
       {data.length === 0 ? (
-        <div className="grid h-64 place-items-center rounded-lg border border-dashed border-hairline-strong text-sm text-paper-faint">
+        <div className={fill ? "grid min-h-0 flex-1 place-items-center rounded-lg border border-dashed border-hairline-strong text-sm text-paper-faint" : "grid h-64 place-items-center rounded-lg border border-dashed border-hairline-strong text-sm text-paper-faint"}>
           Waiting for market data…
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={height}>
+        <div className={fill ? "min-h-0 flex-1" : undefined}>
+          <ResponsiveContainer width="100%" height={fill ? "100%" : height}>
           <ComposedChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
             <defs>
               <linearGradient id="price-area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-brass)" stopOpacity={0.32} />
-                <stop offset="100%" stopColor="var(--color-brass)" stopOpacity={0.01} />
+                <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.32} />
+                <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.01} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="rgba(125,211,252,0.08)" vertical={false} />
+            <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
             <XAxis
               dataKey="date"
               tickFormatter={(value: string) => shortDate(value)}
@@ -78,28 +87,30 @@ export function PriceChart({ quote, height = 300 }: { quote?: MarketQuote; heigh
             />
             <YAxis yAxisId="volume" hide domain={[0, (max: number) => max * 4]} />
             <Tooltip
-              cursor={{ stroke: "rgba(32,199,223,0.42)", strokeDasharray: "3 3" }}
+              cursor={{ stroke: "rgba(255,255,255,0.25)", strokeDasharray: "3 3" }}
               content={<ChartTooltip currency={quote?.currency ?? "INR"} />}
             />
-            <Bar yAxisId="volume" dataKey="volume" fill="rgba(125,211,252,0.14)" />
+            <Bar yAxisId="volume" dataKey="volume" fill="rgba(255,255,255,0.1)" isAnimationActive={!fill} />
             <Area
               yAxisId="price"
               type="monotone"
               dataKey="close"
-              stroke="var(--color-brass)"
+              stroke="var(--color-accent)"
               strokeWidth={1.8}
               fill="url(#price-area)"
               dot={false}
-              activeDot={{ r: 3.5, fill: "var(--color-brass-bright)", strokeWidth: 0 }}
+              isAnimationActive={!fill}
+              activeDot={{ r: 3.5, fill: "var(--color-accent-bright)", strokeWidth: 0 }}
             />
-            <Line yAxisId="price" type="monotone" dataKey="ema50" stroke="var(--color-steel)" strokeWidth={1.1} dot={false} connectNulls opacity={0.75} />
-            <Line yAxisId="price" type="monotone" dataKey="ema200" stroke="var(--color-jade)" strokeWidth={1.1} dot={false} connectNulls opacity={0.75} />
+            <Line yAxisId="price" type="monotone" dataKey="ema50" stroke="var(--color-steel)" strokeWidth={1.1} dot={false} connectNulls opacity={0.85} strokeDasharray="4 3" isAnimationActive={!fill} />
+            <Line yAxisId="price" type="monotone" dataKey="ema200" stroke="var(--color-jade)" strokeWidth={1.1} dot={false} connectNulls opacity={0.75} isAnimationActive={!fill} />
           </ComposedChart>
-        </ResponsiveContainer>
+          </ResponsiveContainer>
+        </div>
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-paper-faint">
-        <LegendMark color="var(--color-brass)" label="Close" />
+        <LegendMark color="var(--color-accent)" label="Close" />
         <LegendMark color="var(--color-steel)" label="EMA 50" />
         <LegendMark color="var(--color-jade)" label="EMA 200" />
         <span className="num ml-auto">{compact(data.at(-1)?.rsi14)} RSI(14) · latest session</span>

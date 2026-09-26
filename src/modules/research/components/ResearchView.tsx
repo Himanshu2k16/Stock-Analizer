@@ -19,7 +19,7 @@ export function ResearchView() {
 
   return (
     <div className="space-y-5">
-      <Panel label="Quick summary" title="What changed?" actions={<Brain size={16} className="text-brass" />}>
+      <Panel label="Quick summary" title="What changed?" actions={<Brain size={16} className="text-accent" />}>
         <div className="grid gap-3 lg:grid-cols-3">
           <Entry tone="steel" label="Fact">
             {selectedQuote
@@ -31,7 +31,7 @@ export function ResearchView() {
             {signedMoney(portfolio.dayPnl)}, unrealized {signedMoney(portfolio.unrealizedPnl)}.
             {rsi !== undefined && ` RSI(14) on the latest close is ${rsi.toFixed(0)}.`}
           </Entry>
-          <Entry tone="brass" label="Interpretation">
+          <Entry tone="accent" label="Interpretation">
             {top
               ? `${top.symbol.replace(".NS", "")} carries ${top.weight.toFixed(1)}% of the book${top.weight > 35 ? " — concentration above a balanced profile." : " — inside a balanced concentration band."}`
               : "Add holdings to unlock risk commentary."}
@@ -47,7 +47,7 @@ export function ResearchView() {
   );
 }
 
-function Entry({ tone, label, children }: { tone: "steel" | "jade" | "brass"; label: string; children: React.ReactNode }) {
+function Entry({ tone, label, children }: { tone: "steel" | "jade" | "accent"; label: string; children: React.ReactNode }) {
   return (
     <article className="rounded-lg border border-hairline bg-ink-850/70 p-4">
       <Pill tone={tone} className="mb-3">
